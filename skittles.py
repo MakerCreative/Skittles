@@ -1,9 +1,37 @@
 # all measurements in mm
 
-PixelWidth = # radius of a skittle
-PixelSpace = # spacing between skittles
+pixelWidth = 10 # radius of a skittle [mm]
+pixelSpace =  7 # spacing between skittles [mm]
 
-# where is zero going to be?
+# where are we going to zero the picker head?
+# let's have the X's be the pickup spots for each colour skittle
+# they should each just have their own coordinates for fine tuning
+# note these will have to have 3 coordinates, could pick and place on different levels.
+
+
+#**************************************************
+#*
+#*
+#*      X      X      X      X       X       X
+#*
+#*
+#*
+#*             ----------------------
+#*             |                    |
+#*             |                    |
+#*             |                    |
+#*             |                    |
+#*             |                    |
+#*             |                    |
+#*             |                    |
+#*             |                    |
+#*             ----------------------
+#*
+#*
+#*
+#*
+#***************************************************
+
 
 # *************** this can be done offline
 
@@ -17,12 +45,12 @@ reducedImage = getReducedImage( colourIndex, inputImage)
 # *************** end this can be done offline
 
 
-foreach row in image
-   foreach column in image
+foreach row in reducedImage
+   foreach column in reducedImage
 
 	pixelColour = getPixelColour( reducedImage, row_i, col_i)
 	
-	pickUpX , pickUpY = getPickupLocation( pixelColour)
+	pickUpX , pickUpY = getPickupLocation( pixelColour )
 
 	gotoLocation(pickUpX , pickUpY)
 
@@ -30,7 +58,7 @@ foreach row in image
 
 	dropX, dropY = getDropLocation( row_i, col_i )
 
-	gotoLocatoin(dropX, dropY)
+	gotoLocation(dropX, dropY)
 
 	dropSkittle()
 
