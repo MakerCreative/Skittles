@@ -44,23 +44,25 @@ reducedImage = getReducedImage( colourIndex, inputImage)
 
 # *************** end this can be done offline
 
+numRows = 16; # take from image
+numCols = 16; # take from image
 
-foreach row in reducedImage
-   foreach column in reducedImage
+for row_i in range(0, numRows-1):
+	for col_i in range(0, numCols - 1):
 
-	pixelColour = getPixelColour( reducedImage, row_i, col_i)
+		pixelColour = getPixelColour( reducedImage, row_i, col_i)
 	
-	pickUpX , pickUpY = getPickupLocation( pixelColour )
+		pickUpX , pickUpY = getPickupLocation( pixelColour )
 
-	gotoLocation(pickUpX , pickUpY)
+		gotoLocation(pickUpX , pickUpY)
 
-	pickupSkittle()
+		pickupSkittle()
 
-	dropX, dropY = getDropLocation( row_i, col_i )
+		dropX, dropY = getDropLocation( row_i, col_i )
 
-	gotoLocation(dropX, dropY)
+		gotoLocation(dropX, dropY)
 
-	dropSkittle()
+		dropSkittle()
 
 
 
