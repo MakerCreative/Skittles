@@ -48,6 +48,8 @@ reducedImage = getReducedImage( colourIndex, inputImage)
 numRows = 16; # take from image
 numCols = 16; # take from image
 
+ser = connectToShapeoko()
+
 for row_i in range(0, numRows-1):
 	for col_i in range(0, numCols - 1):
 
@@ -64,6 +66,17 @@ for row_i in range(0, numRows-1):
 		gotoLocation(dropX, dropY)
 
 		dropSkittle()
+
+
+def connectToShapeoko()
+	return serialObject
+
+def defgetColourIndex()
+	return
+
+def getReducedImage( colourIndex, inputImage)
+	return
+
 
 
 
