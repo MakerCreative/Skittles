@@ -8,9 +8,10 @@ pixelSpace =  7 # spacing between skittles [mm]
 # they should each just have their own coordinates for fine tuning
 # note these will have to have 3 coordinates, could pick and place on different levels.
 
+# Z is an arbitrary zero spot
 
 #**************************************************
-#*
+#*   Z
 #*
 #*      X      X      X      X       X       X
 #*
