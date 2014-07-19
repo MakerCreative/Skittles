@@ -1,3 +1,6 @@
+import serial
+
+
 # all measurements in mm
 
 pixelWidth = 10 # radius of a skittle [mm]
@@ -45,19 +48,23 @@ reducedImage = getReducedImage( colourIndex, inputImage)
 
 # *************** end this can be done offline
 
-numRows = 16; # take from image
-numCols = 16; # take from image
+numRows = 4; # take from image
+numCols = 4; # take from image
 
-ser = connectToShapeoko()
+shapeoko = connectToShapeoko()
 
 for row_i in range(0, numRows-1):
 	for col_i in range(0, numCols - 1):
 
-		pixelColour = getPixelColour( reducedImage, row_i, col_i)
+        #comment out for now, just one pickup (0,0) and move put into grid from there
+		#pixelColour = getPixelColour( reducedImage, row_i, col_i)
 	
-		pickUpX , pickUpY = getPickupLocation( pixelColour )
-
-		gotoLocation(pickUpX , pickUpY)
+		#pickUpX , pickUpY = getPickupLocation( pixelColour )
+        pickUpX = 0 ; 
+        pickUpY = 0 ; 
+        pickUpZ = 0 ; 
+		
+        gotoLocation(pickUpX , pickUpY)
 
 		pickupSkittle()
 
@@ -67,9 +74,39 @@ for row_i in range(0, numRows-1):
 
 		dropSkittle()
 
+def getDropLocation(row_i,col_i)
+    dropX = 0;
+    dropY = 0; 
+
+    xOffset = 0 ;
+    yOffset = 0 ; 
+
+    dropX = xOffset + col_i * (pixelWidth + pixelSpace ) ; 
+    dropY = yOffset + row_i * (pixelWidth + pixelSpace ) ; 
+    
+    return dropX, dropY
+    
+
+
+def gotoLocation(dropX, dropY)
+
+    return
+
+def dropSkittle()
+    return
+
+def pickupSkittle()
+    return
 
 def connectToShapeoko()
-	return serialObject
+    serialObject = serial.Serial(0)
+    print serialObject.name
+
+    return serialObject
+
+def disconnectFromShapeoko(ser)
+    ser.close()
+
 
 def defgetColourIndex()
 	return
