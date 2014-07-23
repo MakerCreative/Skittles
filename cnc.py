@@ -28,7 +28,7 @@ ser = None
 #DEBUG = True
 DEBUG = False
 
-spindleOn = False 
+spindleIsOn = False 
 
 def init():
     """Setup the system, flush grbl, etc."""
@@ -47,7 +47,7 @@ def init():
     command("G21")      # mm units
     command("F50")     # feed at 500mm/min
     command("M05")     # start thd spindle off
-    spindleOn = False
+    spindleIsOn = False
     
 def is_command(cmd):
     """Is cmd a movement/feed command? ie. not GRBL specific"""
@@ -586,16 +586,20 @@ def fillcircle(centre, radius, depth, start_depth=0.0, depth_first=True):
 
 def spindleOn():
     command("M03")
-    spindleOn = True
+    spindleIsOn = True
     return
 
 def spindleOff():
     command("M05")
-    spindleOn = False
+    spindleIsOn = False
     return
 
 def spindleToggle():
-    
+    if spindleIsOn:
+        spindleOff()
+    else:
+        spindleOn()
+    return
 
 
 
