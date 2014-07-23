@@ -28,6 +28,8 @@ ser = None
 #DEBUG = True
 DEBUG = False
 
+spindleOn = False 
+
 def init():
     """Setup the system, flush grbl, etc."""
     # TODO: should we put all the CNC stuff in a class instead?
@@ -44,7 +46,9 @@ def init():
     command("G17")      # plane to x/y
     command("G21")      # mm units
     command("F50")     # feed at 500mm/min
-
+    command("M05")     # start thd spindle off
+    spindleOn = False
+    
 def is_command(cmd):
     """Is cmd a movement/feed command? ie. not GRBL specific"""
     return cmd[0] in "GMF"
@@ -579,4 +583,21 @@ def fillcircle(centre, radius, depth, start_depth=0.0, depth_first=True):
             command("G1 Z0.100")
 
     move_to_safe_height()
+
+def spindleOn():
+    command("M03")
+    spindleOn = True
+    return
+
+def spindleOff():
+    command("M05")
+    spindleOn = False
+    return
+
+def spindleToggle():
+    
+
+
+
+
 
