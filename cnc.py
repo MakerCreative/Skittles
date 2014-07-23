@@ -33,16 +33,17 @@ def init():
     # TODO: should we put all the CNC stuff in a class instead?
     if not DEBUG:
         global ser
-        ser = serial.Serial(com_port, 9600,timeout=2.0)
+        ser = serial.Serial(com_port, 9600,timeout=5.0)
         ser.write("\r\n\r\n")
         time.sleep(2)
         ser.flushInput()
 
-    command("(Initialising...)")
+    
+    #kje this isn't somehting to send to grbl, command("(Initialising...)")
     command("G90")      # mm/min
     command("G17")      # plane to x/y
     command("G21")      # mm units
-    command("F500")     # feed at 500mm/min
+    command("F50")     # feed at 500mm/min
 
 def is_command(cmd):
     """Is cmd a movement/feed command? ie. not GRBL specific"""
@@ -54,10 +55,23 @@ def command(cmd):
         print cmd
         return
 
+    print 'Command is: %s' % cmd
+
     ser.write(cmd.strip() + '\n')
     resp = ser.readline()
+
+    print 'Response is: %s ' % resp
+    
     if is_command(cmd):
+        tries = 3
+        #if resp.rstrip() != 'ok':
+        # from ken here - give it a chance to work again if there was no response
+        while resp.rstrip() != 'ok' and tries > 0:
+            resp = ser.readline()
+            tries = tries - 1
+            time.sleep(5)
         if resp.rstrip() != 'ok':
+            print resp
             raise RuntimeError(resp)
 
     else:

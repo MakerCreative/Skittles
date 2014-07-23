@@ -1,5 +1,5 @@
 import serial
-
+import cnc
 
 # all measurements in mm
 
@@ -51,7 +51,8 @@ reducedImage = getReducedImage( colourIndex, inputImage)
 numRows = 4; # take from image
 numCols = 4; # take from image
 
-shapeoko = connectToShapeoko()
+#shapeoko = connectToShapeoko()
+cnc.init()
 
 for row_i in range(0, numRows-1):
 	for col_i in range(0, numCols - 1):
@@ -59,7 +60,7 @@ for row_i in range(0, numRows-1):
         #comment out for now, just one pickup (0,0) and move put into grid from there
 		#pixelColour = getPixelColour( reducedImage, row_i, col_i)
 	
-		#pickUpX , pickUpY = getPickupLocation( pixelColour )
+		pickUpX , pickUpY = getPickupLocation( )
         pickUpX = 0 ; 
         pickUpY = 0 ; 
         pickUpZ = 0 ; 
@@ -119,7 +120,7 @@ def getReducedImage( colourIndex, inputImage)
 
 # some python snipits
 # note "" is the start and end of multiline comments in python
-""
+"""
 def getImageData(filename):
   [snip]
   return size, (format, version, compression), (width,height)
@@ -129,7 +130,7 @@ size, type, dimensions = getImageData(x)
 http://pyserial.sourceforge.net/shortintro.html
 
 
-""
+"""
 
 
 	

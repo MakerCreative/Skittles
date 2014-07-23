@@ -1,0 +1,433 @@
+looks like 15mm is fine for skittle hole placement for the demo
+
+getting errors after drilling 3 holes in the 16x16 grid
+here is the current output of the program:
+
+pi@raspberrypi ~/makercreative/Skittles $ python drillHoles.py 
+Command is: G90
+Response is: ok
+ 
+Command is: G17
+Response is: ok
+ 
+Command is: G21
+Response is: ok
+ 
+Command is: F200
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X0.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X15.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X30.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X45.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X60.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X75.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X90.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X105.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X120.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X135.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X150.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X165.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X180.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X195.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X210.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X225.000 Y0.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X0.000 Y30.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X15.000 Y30.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is: ok
+ 
+Command is: G0 X30.000 Y30.000
+Response is: ok
+ 
+Command is: G0 Z0
+Response is: ok
+ 
+Command is: G1 Z-1.587
+Response is: ok
+ 
+Command is: G1 Z-2.000
+Response is: ok
+ 
+Command is: G1 Z0
+Response is: ok
+ 
+Command is: G0 Z10.000
+Response is:  
+
+Traceback (most recent call last):
+  File "drillHoles.py", line 28, in <module>
+    cnc.drill( (col*distance + x_offset , row*distance+y_offset), 2)
+  File "/home/pi/makercreative/Skittles/cnc.py", line 211, in drill
+    move_to_safe_height()
+  File "/home/pi/makercreative/Skittles/cnc.py", line 193, in move_to_safe_height
+    command('G0 Z%.03f' % safe_height)
+  File "/home/pi/makercreative/Skittles/cnc.py", line 68, in command
+    raise RuntimeError(resp)
+RuntimeError
+pi@raspberrypi ~/makercreative/Skittles $ 
+
+the problem was that the python cnc.py was looking for 'ok' as a response from grbl but wasn't getting it before the timeout. i increased the time timeout to 5 seconds but also added a 3x retry if we hit the same condition.also added a delay before sending the next command between each drill in the user program (drillHoles.py).
+
+
+
