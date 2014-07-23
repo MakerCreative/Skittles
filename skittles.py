@@ -3,8 +3,14 @@ import cnc
 
 # all measurements in mm
 
-pixelWidth = 10 # radius of a skittle [mm]
-pixelSpace =  7 # spacing between skittles [mm]
+# hole centers were 15 mm appart when drilled
+pixelWidth = 12 # radius of a skittle [mm]
+pixelSpace = 3  # spacing between skittles [mm]
+
+numPickUpSpots = 16  
+curPickUpSpot  = 0  
+
+skittleHeight = 5 # height of a skittle relative to origin
 
 # where are we going to zero the picker head?
 # let's have the X's be the pickup spots for each colour skittle
@@ -75,22 +81,29 @@ for row_i in range(0, numRows-1):
 
 		dropSkittle()
 
+def getPickupLocation()
+    pickupY = 0 # by defn
+    
+    pickupX = 0 + (pixelWidth+pixelSpace)*curPickUpSpot;
+    curPickUpSpot = (curPickUpSpot + 1) % numPickUpSpots; 
+    return (pickupX,pickupY)
+
 def getDropLocation(row_i,col_i)
     dropX = 0;
     dropY = 0; 
 
     xOffset = 0 ;
-    yOffset = 0 ; 
+    yOffset = 30 ; 
 
     dropX = xOffset + col_i * (pixelWidth + pixelSpace ) ; 
     dropY = yOffset + row_i * (pixelWidth + pixelSpace ) ; 
     
-    return dropX, dropY
+    return (dropX, dropY)
     
 
 
 def gotoLocation(dropX, dropY)
-
+    cnc.move(dropX,dropY)
     return
 
 def dropSkittle()
