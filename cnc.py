@@ -2,6 +2,9 @@
 
 """Simple Python CNC transmitter"""
 
+# originally from
+# https://bitbucket.org/anthonyb/python-gcode
+
 gcode_cheat_sheet = """
     (qv. https://github.com/grbl/grbl/wiki and
          http://linuxcnc.org/docs/2.4/html/gcode_main.html )
