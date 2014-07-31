@@ -8,13 +8,19 @@ import cv2
 import numpy as np
 
 def getthresholdedimg(hsv):
+    
+    # opencv hsv divids the 360 degrees of the color wheel by 2 to fit in 8 bits
+    # http://www.hobbitsandhobos.com/wp-content/uploads/2011/06/colorWheel.png
     yellow = cv2.inRange(hsv,np.array((20,100,100)),np.array((30,255,255)))
     blue = cv2.inRange(hsv,np.array((100,100,100)),np.array((120,255,255)))
+    green = cv2.inRange(hsv,np.array((45,50,50)),np.array((75,255,255)))
     both = cv2.add(yellow,blue)
-   # cv2.imshow('yellow',yellow)
+    both = cv2.add(both,green)
+    cv2.imshow('yellow',yellow)
 
-    #cv2.imshow('blue',blue)
+    cv2.imshow('blue',blue)
 
+    cv2.imshow('green', green)
     #cv2.imshow('both',both)
 
     return both
@@ -32,17 +38,16 @@ print "frame width and height : ", width, height
 goodImage = True
 while(goodImage):
     goodImage,f = c.read()
-    
     if not goodImage:
         break; 
-    #f = cv2.pyrDown(f)
-    #f = cv2.flip(f,1)
+
     gray = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
     hsv = cv2.cvtColor(f,cv2.COLOR_BGR2HSV)
 
-    #cv2.imshow('gray',gray)
+    
+    
     he = cv2.equalizeHist(gray)
-    #cv2.imshow('Equalized histogram',he)
+    
     blur2 = cv2.medianBlur(he,5)
     # gives a nice round edge on the skittle:
     #at = cv2.adaptiveThreshold(blur2,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11 ,2 )
@@ -55,7 +60,10 @@ while(goodImage):
     dilate2 = cv2.dilate(erode,kernel)
     cv2.imshow('adaptive threshold',dilate2)
     
-    th3,otsu = cv2.threshold(blur2,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    
+    erode = cv2.erode(blur2,kernel)
+    dilate2 = cv2.dilate(erode,kernel)
+    th3,otsu = cv2.threshold(dilate2,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     cv2.imshow('otsu',otsu)
     #print 'Threshold is %d' % th3
 
