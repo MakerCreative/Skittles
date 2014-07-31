@@ -19,22 +19,22 @@ def getthresholdedimg(hsv):
 
     return both
 
-moviePath = r"C:\temp\makercreative\Skittles\vt2.mp4"
-
-#moviePath = r"C:\data\54-0114\outside test\54-0114.avi"
-
-
+moviePath = r"trackTest.mp4"
 
 c = cv2.VideoCapture(moviePath)
 
 width,height = c.get(3),c.get(4)
 print "frame width and height : ", width, height
 
-# code from
+# some code from
 # https://github.com/abidrahmank/MyRoughWork/blob/master/roughnote/jay_abid_works/jay_abid_1.py
-
-while(1):
-    _,f = c.read()
+    
+goodImage = True
+while(goodImage):
+    goodImage,f = c.read()
+    
+    if not goodImage:
+        break; 
     #f = cv2.pyrDown(f)
     #f = cv2.flip(f,1)
     gray = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
