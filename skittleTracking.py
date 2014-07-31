@@ -19,36 +19,13 @@ def getthresholdedimg(hsv):
 
     return both
 
-moviePath = r"C:\temp\makercreative\IMG_8581.MOV"
+moviePath = r"C:\temp\makercreative\Skittles\vt2.mp4"
 
 #moviePath = r"C:\data\54-0114\outside test\54-0114.avi"
 
-cap = cv2.VideoCapture(0)
-
-if ( not cap.isOpened() ):
-    print "Video open error %s" % moviePath
-
-"""
-while(cap.isOpened()):
-    ret, frame = cap.read()
-
-    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    frame = cv2.pyrDown(frame)
-    cv2.imshow('frame',frame)
-    
-    
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
 
 
-cap.release()
-cv2.destroyAllWindows()
-
-"""
-
-c = cv2.VideoCapture(0)
+c = cv2.VideoCapture(moviePath)
 
 width,height = c.get(3),c.get(4)
 print "frame width and height : ", width, height
