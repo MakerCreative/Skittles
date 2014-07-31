@@ -52,8 +52,8 @@ while(goodImage):
     erosion_size = 1 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(erosion_size,erosion_size))
     erode = cv2.erode(at,kernel)
-    dilate = cv2.dilate(erode,kernel)
-    cv2.imshow('adaptive threshold',dilate)
+    dilate2 = cv2.dilate(erode,kernel)
+    cv2.imshow('adaptive threshold',dilate2)
     
     th3,otsu = cv2.threshold(blur2,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     cv2.imshow('otsu',otsu)
@@ -68,17 +68,34 @@ while(goodImage):
 
     contours,hierarchy = cv2.findContours(dilate,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 
-    '''for cnt in contours:
-        x,y,w,h = cv2.boundingRect(cnt)
-        cx,cy = x+w/2, y+h/2
+
+    centers = []
+    radii = []
+    for contour in contours:
+        area = cv2.contourArea(contour)
+
+        # there is one contour that contains all others, filter it out
+        if area <300:
+            continue
+    
+        br = cv2.boundingRect(contour)
+        radii.append(br[2])
+    
+        m = cv2.moments(contour)
         
-        if 20 < hsv.item(cy,cx,0) < 30:
-            cv2.rectangle(f,(x,y),(x+w,y+h),[0,255,255],2)
-            print "yellow :", x,y,w,h
-        elif 100 < hsv.item(cy,cx,0) < 120:
-            cv2.rectangle(f,(x,y),(x+w,y+h),[255,0,0],2)
-            print "blue :", x,y,w,h
-'''
+
+        center = (int(m['m10'] / m['m00']), int(m['m01'] / m['m00']))
+        centers.append(center)
+        
+    print("There are {} circles".format(len(centers)))
+
+    if len(radii) > 0:
+        radius = int(np.average(radii)) + 5
+
+        for center in centers:
+            cv2.circle(f, center, 3, (255, 0, 0), -1)
+            cv2.circle(f, center, radius, (0, 255, 0), 1)    
+
     cv2.imshow('img',f)
 
     if cv2.waitKey(25) == 27:
