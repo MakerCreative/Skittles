@@ -7,6 +7,12 @@ Created on Jul 28, 2014
 import cv2
 import numpy as np
 
+tCanny1 = 50
+tCanny2 = 60
+tFrameNo = 100
+tApSize = 5
+tBlurSigma = 20
+
 def getthresholdedimg(hsv):
     yellow = cv2.inRange(hsv,np.array((20,100,100)),np.array((30,255,255)))
     blue = cv2.inRange(hsv,np.array((100,100,100)),np.array((120,255,255)))
@@ -312,29 +318,215 @@ def test7(f):
 
     return
 
+  
+    
+def test8(f):
+    
+    global tCanny1
+    global tCanny2
+    global tApSize
+    global tBlurSigma
+    
+    gray = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
+    
+    
+    cv2.imshow('TEST 8: Gray',gray)
+    eh = cv2.equalizeHist(gray)
+    cv2.imshow('TEST 8: eh',eh)
+    
+    print '\t %d' % tApSize
+    edges = cv2.Canny(eh,tCanny1,tCanny2,tApSize)
+    
+    cv2.imshow('TEST 8: Basic Canny',edges)
+    return
+
+def trackChange(v):
+    
+    global tCanny1
+    global tCanny2
+    global tFrameNo
+    global tApSize
+    global tBlurSigma
+    
+    tCanny1 = cv2.getTrackbarPos('Canny1','Trackbars')
+    tCanny2 = cv2.getTrackbarPos('Canny2','Trackbars')
+    tFrameNo = int(cv2.getTrackbarPos('FrameNo','Trackbars'))
+    tApSize = cv2.getTrackbarPos('ApSize','Trackbars')
+    
+    if tApSize % 2 == 0:
+        tApSize = tApSize + 1 
+    tBlurSigma = cv2.getTrackbarPos('BlurSigma','Trackbars')
+    
+    
+    return
+
+def test9(frame, tr, tg, tb):
+
+
+    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #gray = cv2.equalizeHist(gray)
+
+    #grayt = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    
+    cv2.imshow("TEST9: input",frame)
+    rr = cv2.matchTemplate(frame, tr, cv2.TM_CCOEFF_NORMED)
+    rg = cv2.matchTemplate(frame, tg, cv2.TM_CCOEFF_NORMED)
+    rb = cv2.matchTemplate(frame, tb, cv2.TM_CCOEFF_NORMED)
+
+    res = cv2.add(rr,rg)
+    res = cv2.add(res,rb)
+    
+    cv2.imshow("TEST9: result" , res)
+    return
+
+def test10(frame):
+    # http://swarminglogic.com/article/2013_11_skittles
+    hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+    h,s,v = cv2.split(hsv)
+    #s = cv2.equalizeHist(s)
+    blur = cv2.GaussianBlur(s,(21,21),15)
+    res = cv2.adaptiveThreshold(blur,100,cv2.ADAPTIVE_THRESH_MEAN_C , cv2.THRESH_BINARY_INV,7,2)
+    cv2.imshow("test10 input",frame)
+    cv2.imshow("test10 result",res)
+
+def test11(f):
+    # test 11 is a breakoff of test 2, which has the best borders around the skittles.
+    
+    gray = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
+    hsv = cv2.cvtColor(f,cv2.COLOR_BGR2HSV)
+    he = cv2.equalizeHist(gray)
+    
+ 
+    blur2 = cv2.GaussianBlur(he,(5,5),0)
+    # gives a nice round edge on the skittle:
+    #at = cv2.adaptiveThreshold(blur2,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11 ,2 )
+    
+    at = cv2.adaptiveThreshold(blur2,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,15 ,4)
+    
+    #cv2.imshow('TEST 11: adaptive threshold',at)
+    
+    
+    # let's look for circles here
+    
+    
+    
+    erosion_size = 5
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(erosion_size,erosion_size))
+    erode = cv2.erode(at,kernel)
+    dilate2 = cv2.dilate(erode,kernel)
+    cv2.imshow('TEST 11: adaptive threshold erode dialate',dilate2)
+    
+    #at_open = cv2.morphologyEx(at, cv2.MORPH_OPEN, kernel)
+    at_close = cv2.morphologyEx(at, cv2.MORPH_CLOSE, kernel)
+    
+    #cv2.imshow('TEST 11: at_open',at_open)
+    cv2.imshow('TEST 11: at_close',at_close)
+    
+    '''
+    erode = cv2.erode(blur2,kernel)
+    dilate2 = cv2.dilate(erode,kernel)
+    th3,otsu = cv2.threshold(dilate2,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    cv2.imshow('TEST 11: otsu',otsu)
+    #print 'Threshold is %d' % th3
+    '''
+
+    
+   
+
+    contours,hierarchy = cv2.findContours(at_close,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    cv2.drawContours(f,contours, -1,(255,255,255),-1)
+
+    centers = []
+    radii = []
+    print "there are %d contours" % len(contours)
+    for contour in contours:
+        area = cv2.contourArea(contour)
+
+        # there is one contour that contains all others, filter it out
+        if area <300:
+            continue
+    
+        br = cv2.boundingRect(contour)
+        radii.append(br[2])
+    
+        m = cv2.moments(contour)
+        
+
+        center = (int(m['m10'] / m['m00']), int(m['m01'] / m['m00']))
+        centers.append(center)
+        
+    print("There are {} circles".format(len(centers)))
+
+    if len(radii) > 0:
+        radius = int(np.average(radii)) + 5
+
+        for center in centers:
+            cv2.circle(f, center, 3, (255, 0, 0), -1)
+            cv2.circle(f, center, radius, (0, 255, 0), 1)    
+
+    cv2.imshow('TEST 11: Contour Circles',f)
+    return
+
+#####################################################################################
 if __name__ == "__main__":
+    global tCanny1
+    global tCanny2
+    global tFrameNo
+    global tApSize
+    global tBlurSigma
     
     moviePath = r"trackTest.mp4"
     moviePath = r"trackTestCuttingBoard4cmabove.mp4"
     
     c = cv2.VideoCapture(moviePath)
     
+    numFrames = int(c.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
     
-    # some code from
+    '''
+    cv2.namedWindow('Trackbars',cv2.WINDOW_NORMAL)
+    cv2.cv.CreateTrackbar( 'Canny1', 'Trackbars',tCanny1, 100, trackChange)
+    cv2.cv.CreateTrackbar( 'Canny2', 'Trackbars',tCanny2, 100, trackChange)
+    cv2.cv.CreateTrackbar('FrameNo', 'Trackbars',tFrameNo, numFrames, trackChange)
+    cv2.cv.CreateTrackbar( 'ApSize', 'Trackbars',tApSize, 50, trackChange)
+    cv2.cv.CreateTrackbar( 'BlurSigma', 'Trackbars',tBlurSigma, 100, trackChange)
+'''
+    
         
     goodImage = True
+    
+    # for test9
+    #r = cv2.imread('tr.png')
+    #g = cv2.imread('tg.png')
+    #b = cv2.imread('tb.png')
+    
     while(goodImage):
+        #print tFrameNo
+        #c.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, frameNumber+20)
+        #c.set(cv2.cv.CV_CAP_PROP_POS_FRAMES,tFrameNo)
         goodImage,frame = c.read()
+        
+        # hit the end of the file
         if not goodImage:
-            break; 
+            #c.set(cv2.cv.CV_CAP_PROP_POS_FRAMES,0)
+            #goodImage,frame = c.read()
+            #continue
+            break
        
-        cv2.imshow("ORIGINA MAFAKA", frame)   
+        #cv2.imshow("ORIGNAL MAFAKA", frame)   
+        
+        # looking for colours in hsv and then contours
         #frame1 = frame.copy()
         #test1(frame1)
         
+        # many threshold types together - a mess
+        # however the current settings in this provide
+        # a very good outline of each skittle colour
         #frame2 = frame.copy()
         #test2(frame2)
         
+        #split from test 2
+        # adaptive threshold
+        # same good outline in the middle
         #frame3 = frame.copy()
         #test3(frame3)
         
@@ -351,11 +543,34 @@ if __name__ == "__main__":
         #test6(frame6)
         
         # hough trasnform
-        frame7 = frame.copy()
-        test7(frame7)
+        #frame7 = frame.copy()
+        #test7(frame7)
         
-        if cv2.waitKey(25) == 27:
+        # basic canny edge to see what we get
+        #frame8 = frame.copy()
+        #test8(frame8)
+        
+        # let's try template matching
+        #frame9 = frame.copy()
+        #test9(frame9,r,g,b)
+        
+        # http://swarminglogic.com/article/2013_11_skittles
+        #frame10 = frame.copy()
+        #test10(frame10)
+        
+        # starting again from where test2 left off, it worked well
+        # finding the skittle edges
+        frame11 = frame.copy()
+        test11(frame11)
+        
+        key = cv2.waitKey(50) 
+        if key == 27:
             break
+        if key == 32:
+            tFrameNo = tFrameNo + 1     
+            cv2.setTrackbarPos('FrameNo','Trackbars',tFrameNo)
+
+        
     
     cv2.destroyAllWindows()
     c.release()
