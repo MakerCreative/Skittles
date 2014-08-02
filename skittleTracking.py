@@ -434,14 +434,18 @@ def test11(f):
    
 
     contours,hierarchy = cv2.findContours(at_close,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-    cv2.drawContours(f,contours, -1,(255,255,255),-1)
+    
 
     centers = []
     radii = []
-    print "there are %d contours" % len(contours)
+    #print "there are %d contours" % len(contours)
+    maxArea = 0
+    maxC = []
     for contour in contours:
         area = cv2.contourArea(contour)
-
+        if area > maxArea:
+            maxArea = area
+            maxC = contour
         # there is one contour that contains all others, filter it out
         if area <300:
             continue
@@ -454,7 +458,14 @@ def test11(f):
 
         center = (int(m['m10'] / m['m00']), int(m['m01'] / m['m00']))
         centers.append(center)
-        
+    
+    # at the end we've found a maximum contour
+    # TODO average frames from the camera - take a temporal average of N frames
+    c,r = cv2.minEnclosingCircle(maxC)
+    cv2.drawContours(f,maxC, -1,(255,255,255),-1)    
+    cv2.circle(f, (int(c[0]),int(c[1])), 5, (0, 255, 255), -1)
+    #cv2.circle(f, (int(c[0]),int(c[1])), int(r), (0, 255, 0), 1)    
+    '''
     print("There are {} circles".format(len(centers)))
 
     if len(radii) > 0:
@@ -463,7 +474,7 @@ def test11(f):
         for center in centers:
             cv2.circle(f, center, 3, (255, 0, 0), -1)
             cv2.circle(f, center, radius, (0, 255, 0), 1)    
-
+'''
     cv2.imshow('TEST 11: Contour Circles',f)
     return
 
@@ -478,7 +489,7 @@ if __name__ == "__main__":
     moviePath = r"trackTest.mp4"
     moviePath = r"trackTestCuttingBoard4cmabove.mp4"
     
-    c = cv2.VideoCapture(moviePath)
+    c = cv2.VideoCapture(0)
     
     numFrames = int(c.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
     
@@ -498,7 +509,7 @@ if __name__ == "__main__":
     #r = cv2.imread('tr.png')
     #g = cv2.imread('tg.png')
     #b = cv2.imread('tb.png')
-    
+    goodImage,frame11_old = c.read()
     while(goodImage):
         #print tFrameNo
         #c.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, frameNumber+20)
@@ -561,7 +572,11 @@ if __name__ == "__main__":
         # starting again from where test2 left off, it worked well
         # finding the skittle edges
         frame11 = frame.copy()
-        test11(frame11)
+        
+        #some temporal averaging for frame11
+        frame11avg = cv2.addWeighted(frame11,.9,frame11_old,.1,0)
+        test11(frame11avg)
+        frame11_old = frame11avg.copy()
         
         key = cv2.waitKey(50) 
         if key == 27:
