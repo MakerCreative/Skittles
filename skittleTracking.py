@@ -393,7 +393,7 @@ def test11(f):
     # test 11 is a breakoff of test 2, which has the best borders around the skittles.
     
     gray = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-    hsv = cv2.cvtColor(f,cv2.COLOR_BGR2HSV)
+   # hsv = cv2.cvtColor(f,cv2.COLOR_BGR2HSV)
     he = cv2.equalizeHist(gray)
     
  
@@ -446,6 +446,8 @@ def test11(f):
         if area > maxArea:
             maxArea = area
             maxC = contour
+            
+            '''
         # there is one contour that contains all others, filter it out
         if area <300:
             continue
@@ -458,23 +460,37 @@ def test11(f):
 
         center = (int(m['m10'] / m['m00']), int(m['m01'] / m['m00']))
         centers.append(center)
-    
+    '''
     # at the end we've found a maximum contour
     # TODO average frames from the camera - take a temporal average of N frames
+    
+    # find the smallest circle that encloses that maximum contour
+    # let's hope it's a skittle!
     c,r = cv2.minEnclosingCircle(maxC)
-    cv2.drawContours(f,maxC, -1,(255,255,255),-1)    
-    cv2.circle(f, (int(c[0]),int(c[1])), 5, (0, 255, 255), -1)
-    #cv2.circle(f, (int(c[0]),int(c[1])), int(r), (0, 255, 0), 1)    
-    '''
-    print("There are {} circles".format(len(centers)))
+    cv2.drawContours(f,maxC, -1,(255,255,255),-1)
+    
+    red = (0   , 0, 255)    
+    green = (0, 255, 0)
+    blue = (255, 0 , 0 )
+    # draw a circle where we found the center of the skittles
+    cv2.circle(f, (int(c[0]),int(c[1])), 5, green, -1)
+    
+    # find the center of the image and draw a circle there
+    frameSize = f.shape
+    img_c_y = frameSize[0] / 2 
+    img_c_x = frameSize[1] / 2
+    cv2.circle(f, (int(img_c_x),int(img_c_y)), 5, red, -1)
+    
+    # using a function attribute for a persistent variable
+    # trying to use a weighted average of the center of the skittle to filter it
+    weight = 0.3
+    test11.centerx = int(test11.centerx * weight + c[0]*(1.0-weight))
+    test11.centery = int(test11.centery * weight + c[1]*(1.0-weight))
+    #cv2.circle(f, (test11.centerx , test11.centery), 10, red, -1)
 
-    if len(radii) > 0:
-        radius = int(np.average(radii)) + 5
-
-        for center in centers:
-            cv2.circle(f, center, 3, (255, 0, 0), -1)
-            cv2.circle(f, center, radius, (0, 255, 0), 1)    
-'''
+    # draw a line between the center of the image and the center of the skittle
+    cv2.line(f, (int(img_c_x),int(img_c_y)) , (int(c[0]),int(c[1])), red,2)
+ 
     cv2.imshow('TEST 11: Contour Circles',f)
     return
 
@@ -510,6 +526,8 @@ if __name__ == "__main__":
     #g = cv2.imread('tg.png')
     #b = cv2.imread('tb.png')
     goodImage,frame11_old = c.read()
+    test11.centerx = 1.0
+    test11.centery = 1.0
     while(goodImage):
         #print tFrameNo
         #c.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, frameNumber+20)
