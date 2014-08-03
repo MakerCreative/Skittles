@@ -6,6 +6,7 @@ Created on Jul 28, 2014
 
 import cv2
 import numpy as np
+import cnc
 
 tCanny1 = 50
 tCanny2 = 60
@@ -491,16 +492,25 @@ def test11(f):
     # draw a line between the center of the image and the center of the skittle
     cv2.line(f, (int(img_c_x),int(img_c_y)) , (int(c[0]),int(c[1])), red,2)
  
+ 
+    # instead of using the center of the min circle, let's use the moment of the contour
+    m = cv2.moments(maxC)
+    center = (int(m['m10'] / m['m00']), int(m['m01'] / m['m00']))
+    cv2.circle(f, center, 5, blue, -1)
+
+    
     cv2.imshow('TEST 11: Contour Circles',f)
     return
 
 #####################################################################################
 if __name__ == "__main__":
-    global tCanny1
-    global tCanny2
-    global tFrameNo
-    global tApSize
-    global tBlurSigma
+    #global tCanny1
+    #global tCanny2
+    #global tFrameNo
+    #global tApSize
+    #global tBlurSigma
+    
+    #cnc.init()
     
     moviePath = r"trackTest.mp4"
     moviePath = r"trackTestCuttingBoard4cmabove.mp4"
@@ -534,13 +544,15 @@ if __name__ == "__main__":
         #c.set(cv2.cv.CV_CAP_PROP_POS_FRAMES,tFrameNo)
         goodImage,frame = c.read()
         
+        
         # hit the end of the file
         if not goodImage:
             #c.set(cv2.cv.CV_CAP_PROP_POS_FRAMES,0)
             #goodImage,frame = c.read()
             #continue
             break
-       
+    
+        frame = cv2.flip(frame,-1)   
         #cv2.imshow("ORIGNAL MAFAKA", frame)   
         
         # looking for colours in hsv and then contours
