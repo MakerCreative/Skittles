@@ -41,49 +41,56 @@ def findSkittle(f):
             maxC = contour
             
     # at the end we've found the maximum contour
-    # find the smallest circle that encloses that maximum contour
-    minCircleCenter,minCircleRadius = cv2.minEnclosingCircle(maxC)
-    
-    
-   
     
     # find the center of the image and draw a circle there
     frameSize = f.shape
     frameCenter = ( int(frameSize[1] / 2), int(frameSize[0] / 2 ))
     
-    # instead of using the center of the min circle, let's use the moment of the contour
+    # find the middle point of all the points on the contour
     m = cv2.moments(maxC)
     contourCenter = (int(m['m10'] / m['m00']), int(m['m01'] / m['m00']))
     
-    
+    delta = np.subtract( contourCenter , frameCenter)
+    distance = np.linalg.norm(delta)
+
     # draw what we've found in the image
-    
     # some colours to draw with - we are BGR from the webcam
     red   = ( 000 , 000 , 255 )    
     green = ( 000 , 255 , 000 )
     blue  = ( 255 , 000 , 000 )
-   
+    white = ( 255 , 255 , 255 )
+    black = ( 000 , 000 , 000 )
     
-    cv2.drawContours(f,maxC, -1,(255,255,255),-1)
-    
-    cv2.circle(f, (int(minCircleCenter[0]),int(minCircleCenter[1])), 5, green, -1)
-    
-    cv2.circle(f, frameCenter , 5, red, -1)
-    
-    # draw a line between the center of the image and the center of the skittle
-    cv2.line(f, frameCenter , (int(minCircleCenter[0]),int(minCircleCenter[1])), red,2)
- 
- 
-    cv2.circle(f, contourCenter, 5, blue, -1)
-
+    maxDistance = 200
+    if distance < maxDistance: 
+        cv2.drawContours(f,maxC, -1, white ,-1)
+        
+        cv2.circle(f, frameCenter , 7, red, -1)
+        cv2.circle(f, frameCenter , 5, white, -1)
+        cv2.circle(f, frameCenter , 3, red, -1)
+        
+        cv2.circle(f, contourCenter, 7, white, -1)
+        cv2.circle(f, contourCenter, 5, black, -1)
+        cv2.circle(f, contourCenter, 3, white, -1)
+        
+        cv2.line(f, frameCenter , contourCenter , red,2)
+     
+        dispString = "X: %d" % delta[0]
+        cv2.putText(f, dispString, (0, 50), cv2.FONT_HERSHEY_PLAIN, 3.0, red ,3)
+     
+        dispString = "Y: %d" % delta[1]
+        cv2.putText(f, dispString, (0, 100), cv2.FONT_HERSHEY_PLAIN, 3.0, red ,3)
+        
+        dispString = "D: %d" % distance
+        cv2.putText(f, dispString, (0, 150), cv2.FONT_HERSHEY_PLAIN, 3.0, red ,3)
     
     cv2.imshow('TEST 11: Contour Circles',f)
-    return
+    return delta
 
 #####################################################################################
 if __name__ == "__main__":
     
-    #cnc.init()
+    cnc.init()
         
     c = cv2.VideoCapture(0)
     
@@ -101,13 +108,24 @@ if __name__ == "__main__":
         
         #some temporal averaging for frame11
         frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
-        findSkittle(frameAvg)
+        deltaPx = findSkittle(frameAvg)
         frameOld = frameAvg.copy()
+        minError = 1
+        distanceToSkittlePx =     np.linalg.norm(deltaPx)
+         
+        
+
         
         # wait for a key press and see if we need to do anything
         key = cv2.waitKey(50) 
         if key == 27:
             break
+        if key == 32:
+            if distanceToSkittlePx > minError:
+                scalePxToMM = .05
+                deltaMM = deltaPx * scalePxToMM 
+                cnc.move( (deltaMM[0] , -deltaMM[1]))
+                # to do this move needs to be relative
                 
     # program is done, clean up
     cv2.destroyAllWindows()
