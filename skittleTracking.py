@@ -10,6 +10,9 @@ import cnc
 import time
 
 camera = None
+frameAvg = None
+frameOld = None
+firstFrame = True
 
 def findSkittle(f):
     
@@ -97,14 +100,40 @@ def init():
         return False
     return True
 
+def getFrame():
+    global frameAvg
+    global frameOld
+    global firstFrame
+     
+    goodImage,frame = camera.read()
+    frame = cv2.flip(frame,-1)
+     
+    if firstFrame:
+        firstFrame = False
+        frameOld = frame.copy()
+        frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
 
+    else:
+        frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
+        frameOld = frameAvg.copy()
 
+def moveToSkittle(deltaPX):
+    distanceToSkittlePx =     np.linalg.norm(deltaPx)
+    
+    # move if we are too far away and havne't moved for a bit
+    minError = 2 # pixels
+    
+    #if distanceToSkittlePx > minError and (( now - lastMove)> minTimeDelta):
+    if cnc.getState() == 'Idle' and distanceToSkittlePx > minError:
+        scalePxToMM = .05 # this is approximate
+        deltaMM = deltaPx * scalePxToMM 
+        cnc.rapidmoveNoZ( (deltaMM[0] , -deltaMM[1]))
+    
+    
 #####################################################################################
 if __name__ == "__main__":
-    
     init()
     
-    goodImage,frameOld = camera.read()
     
     #fourcc = cv2.cv.FOURCC('M', 'P', 'E', 'G')
     #print fourcc
@@ -118,39 +147,14 @@ if __name__ == "__main__":
     cnc.setCoordRelative()
 
 
-    while(goodImage):
+    while(True):
     
-        goodImage,frame = camera.read()
-        if not goodImage:
-            break
-  
-        # make the image look right as if we are facing the front of the shapeoko  
-        frame = cv2.flip(frame,-1)   
-        
-        
-        #some temporal averaging for frame11
-        frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
+        getFrame()
+
         deltaPx = findSkittle(frameAvg)
-        frameOld = frameAvg.copy()
-        
-        distanceToSkittlePx =     np.linalg.norm(deltaPx)
-         
        
-        now =  time.time()
-        
-        # move if we are too far away and havne't moved for a bit
-        minError = 2 # pixels
-        minTimeDelta = 1 #seconds
-        #if distanceToSkittlePx > minError and (( now - lastMove)> minTimeDelta):
-        if cnc.getState() == 'Idle' and distanceToSkittlePx > minError:
-                scalePxToMM = .05 # this is approximate
-                deltaMM = deltaPx * scalePxToMM 
-                cnc.rapidmoveNoZ( (deltaMM[0] , -deltaMM[1]))
-                
-                 
-              
-        #outputVideo.write(frameAvg)
-        
+        moveToSkittle(deltaPx)
+            
         # wait for a key press and see if we need to do anything
         key = cv2.waitKey(50) 
         if key == 27: # escape
