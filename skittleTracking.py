@@ -9,6 +9,8 @@ import numpy as np
 import cnc
 import time
 
+camera = None
+
 def findSkittle(f):
     
     # work in grayscale
@@ -88,33 +90,37 @@ def findSkittle(f):
     cv2.imshow('TEST 11: Contour Circles',f)
     return delta
 
+def init():
+    global camera  
+    camera = cv2.VideoCapture(0)
+    if not camera.isOpened():
+        return False
+    return True
+
+
+
 #####################################################################################
 if __name__ == "__main__":
     
+    init()
     
-        
-    c = cv2.VideoCapture(0)
+    goodImage,frameOld = camera.read()
     
-    goodImage,frameOld = c.read()
+    #fourcc = cv2.cv.FOURCC('M', 'P', 'E', 'G')
+    #print fourcc
+    #outputVideo = cv2.VideoWriter('output.avi',fourcc ,fps=20,
+    #                   frameSize = (640,480),
+    #                    isColor=True)
     
-    fourcc = cv2.cv.FOURCC('M', 'P', 'E', 'G')
-    print fourcc
-    outputVideo = cv2.VideoWriter('output.avi',fourcc ,fps=20,
-                        frameSize = (640,480),
-                        isColor=True)
-    
-    if not outputVideo.isOpened():
-        print "Could not open file for writing"
-        exit()
         
         
     cnc.init()
     cnc.setCoordRelative()
-    lastMove = time.time()
+
 
     while(goodImage):
     
-        goodImage,frame = c.read()
+        goodImage,frame = camera.read()
         if not goodImage:
             break
   
@@ -133,17 +139,17 @@ if __name__ == "__main__":
         now =  time.time()
         
         # move if we are too far away and havne't moved for a bit
-        minError = 3 # pixels
+        minError = 2 # pixels
         minTimeDelta = 1 #seconds
-        if distanceToSkittlePx > minError and (( now - lastMove)> minTimeDelta):
-                scalePxToMM = .05
+        #if distanceToSkittlePx > minError and (( now - lastMove)> minTimeDelta):
+        if cnc.getState() == 'Idle' and distanceToSkittlePx > minError:
+                scalePxToMM = .05 # this is approximate
                 deltaMM = deltaPx * scalePxToMM 
                 cnc.rapidmoveNoZ( (deltaMM[0] , -deltaMM[1]))
-                lastMove = time.time()
+                
                  
               
-              
-        outputVideo.write(frameAvg)
+        #outputVideo.write(frameAvg)
         
         # wait for a key press and see if we need to do anything
         key = cv2.waitKey(50) 
@@ -155,5 +161,4 @@ if __name__ == "__main__":
                 
     # program is done, clean up
     cv2.destroyAllWindows()
-    c.release()
-    outputVideo.release()
+    camera.release()

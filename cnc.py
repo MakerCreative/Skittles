@@ -20,6 +20,8 @@ gcode_cheat_sheet = """
 import math
 import serial
 import time
+import re
+
 
 com_port = 'COM13'
 #com_port = '/dev/ttyACM0'
@@ -68,12 +70,12 @@ def command(cmd):
         print cmd
         return
 
-    print 'Command is: %s' % cmd
+    #print 'Command is: %s' % cmd
 
     ser.write(cmd.strip() + '\n')
     resp = ser.readline()
 
-    print 'Response is: %s ' % resp
+    #print 'Response is: %s ' % resp
     
     if is_command(cmd):
         #tries = 3
@@ -622,6 +624,33 @@ def spindleToggle():
         spindleOn()
     return
 
+def getStatus():
+    
+    # get grbl status
+    # something like:
+    # <Idle,MPos:5.529,0.560,7.000,WPos:1.529,-5.440,-0.000>
+    return command("?")
+
+def getState():
+    
+    # get grbl state
+    resp = getStatus()
+    #print "Resp is:"
+    #print resp
+    
+    # pull out the state from the status, after the '<' before the ','
+    #<Idle,MPos:5.529,0.560,7.000,WPos:1.529,-5.440,-0.000>
+    p = re.compile('\<(\w*),.*')
+    ans = p.findall(resp[0])
+    #print "Ans is:"
+    #print ans
+    if len(ans):
+        return ans[0]
+    else:
+        return None
+        
+    
+    
 
 
 
