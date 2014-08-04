@@ -21,6 +21,9 @@ import math
 import serial
 import time
 
+com_port = 'COM13'
+#com_port = '/dev/ttyACM0'
+
 ### Gerbil magic
 
 ser = None
@@ -104,8 +107,7 @@ safe_height = 10.000
 tab_width = tool_width
 tab_height = tool_width / 2
 
-#com_port = 'COM11'
-com_port = '/dev/ttyACM0'
+
 
 
 ### grbl setup
@@ -196,6 +198,11 @@ def rapidmove(pos):
     command("G0 X%.03f Y%.03f" % pos)
     command("G0 Z0")
 
+
+def rapidmoveNoZ(pos):
+    """Move up to safe height, then rapid to pos, then down to z=0."""
+    command("G0 X%.03f Y%.03f" % pos)
+    
 def move(pos):
     """Move to pos, at current depth.
     !Dangerous! if you're at the bottom of a hole and you
@@ -589,6 +596,14 @@ def fillcircle(centre, radius, depth, start_depth=0.0, depth_first=True):
             command("G1 Z0.100")
 
     move_to_safe_height()
+
+def setCoordAbsolute():
+    command("G90")
+    return
+
+def setCoordRelative():
+    command("G91")
+    return
 
 def spindleOn():
     command("M03")

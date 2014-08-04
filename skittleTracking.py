@@ -7,6 +7,7 @@ Created on Jul 28, 2014
 import cv2
 import numpy as np
 import cnc
+import time
 
 def findSkittle(f):
     
@@ -90,12 +91,27 @@ def findSkittle(f):
 #####################################################################################
 if __name__ == "__main__":
     
-    cnc.init()
+    
         
     c = cv2.VideoCapture(0)
     
     goodImage,frameOld = c.read()
     
+    fourcc = cv2.cv.FOURCC('M', 'P', 'E', 'G')
+    print fourcc
+    outputVideo = cv2.VideoWriter('output.avi',fourcc ,fps=20,
+                        frameSize = (640,480),
+                        isColor=True)
+    
+    if not outputVideo.isOpened():
+        print "Could not open file for writing"
+        exit()
+        
+        
+    cnc.init()
+    cnc.setCoordRelative()
+    lastMove = time.time()
+
     while(goodImage):
     
         goodImage,frame = c.read()
@@ -110,23 +126,34 @@ if __name__ == "__main__":
         frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
         deltaPx = findSkittle(frameAvg)
         frameOld = frameAvg.copy()
-        minError = 1
+        
         distanceToSkittlePx =     np.linalg.norm(deltaPx)
          
+       
+        now =  time.time()
         
-
+        # move if we are too far away and havne't moved for a bit
+        minError = 3 # pixels
+        minTimeDelta = 1 #seconds
+        if distanceToSkittlePx > minError and (( now - lastMove)> minTimeDelta):
+                scalePxToMM = .05
+                deltaMM = deltaPx * scalePxToMM 
+                cnc.rapidmoveNoZ( (deltaMM[0] , -deltaMM[1]))
+                lastMove = time.time()
+                 
+              
+              
+        outputVideo.write(frameAvg)
         
         # wait for a key press and see if we need to do anything
         key = cv2.waitKey(50) 
-        if key == 27:
+        if key == 27: # escape
             break
-        if key == 32:
-            if distanceToSkittlePx > minError:
-                scalePxToMM = .05
-                deltaMM = deltaPx * scalePxToMM 
-                cnc.move( (deltaMM[0] , -deltaMM[1]))
-                # to do this move needs to be relative
+        
+        #if key == 32: #space
+            
                 
     # program is done, clean up
     cv2.destroyAllWindows()
     c.release()
+    outputVideo.release()
