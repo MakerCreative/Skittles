@@ -7,10 +7,14 @@ import cnc
 pixelWidth = 12 # radius of a skittle [mm]
 pixelSpace = 3  # spacing between skittles [mm]
 
+global numPickUpSpots 
+global curPickUpSpot 
+
 numPickUpSpots = 16  
 curPickUpSpot  = 0  
 
-skittleHeight = 5 # height of a skittle relative to origin
+#global skittleHeight
+#skittleHeight = 7 # height of a skittle relative to origin
 
 # where are we going to zero the picker head?
 # let's have the X's be the pickup spots for each colour skittle
@@ -46,86 +50,65 @@ skittleHeight = 5 # height of a skittle relative to origin
 # *************** this can be done offline
 
 # get the set of colours we can use for this piece
-colourIndex = getColourIndex()
+#colourIndex = getColourIndex()
 
 # get a 2d grid of pixels from our input image using our colour index
 # might be able to do this with PIL or Pillow
-reducedImage = getReducedImage( colourIndex, inputImage)
+#reducedImage = getReducedImage( colourIndex, inputImage)
 
 # *************** end this can be done offline
 
-numRows = 4; # take from image
-numCols = 4; # take from image
+numRows = 15 # take from image
+numCols = 15 # take from image
+def getPickupLocation():
+    global curPickUpSpot
 
-#shapeoko = connectToShapeoko()
-cnc.init()
-
-for row_i in range(0, numRows-1):
-	for col_i in range(0, numCols - 1):
-
-        #comment out for now, just one pickup (0,0) and move put into grid from there
-		#pixelColour = getPixelColour( reducedImage, row_i, col_i)
-	
-		pickUpX , pickUpY = getPickupLocation( )
-        pickUpX = 0 ; 
-        pickUpY = 0 ; 
-        pickUpZ = 0 ; 
-		
-        gotoLocation(pickUpX , pickUpY)
-
-		pickupSkittle()
-
-		dropX, dropY = getDropLocation( row_i, col_i )
-
-		gotoLocation(dropX, dropY)
-
-		dropSkittle()
-
-def getPickupLocation()
     pickupY = 0 # by defn
     
-    pickupX = 0 + (pixelWidth+pixelSpace)*curPickUpSpot;
-    curPickUpSpot = (curPickUpSpot + 1) % numPickUpSpots; 
-    return (pickupX,pickupY)
+    pickupX = 0 + (pixelWidth+pixelSpace)*curPickUpSpot
+    curPickUpSpot = (curPickUpSpot + 1) % numPickUpSpots 
+    return pickupX,pickupY
 
-def getDropLocation(row_i,col_i)
-    dropX = 0;
-    dropY = 0; 
+def getDropLocation(row_i,col_i):
+    dropX = 0
+    dropY = 0 
 
-    xOffset = 0 ;
-    yOffset = 30 ; 
+    xOffset = 0 
+    yOffset = 30  
 
-    dropX = xOffset + col_i * (pixelWidth + pixelSpace ) ; 
-    dropY = yOffset + row_i * (pixelWidth + pixelSpace ) ; 
+    dropX = xOffset + row_i * (pixelWidth + pixelSpace )  
+    dropY = yOffset + col_i * (pixelWidth + pixelSpace )  
     
-    return (dropX, dropY)
+    return dropX, dropY
     
 
 
-def gotoLocation(dropX, dropY)
-    cnc.move(dropX,dropY)
+def gotoLocation(dropX, dropY):
+    cnc.rapidmove((dropX,dropY))
     return
 
-def dropSkittle()
+def dropSkittle():
+    cnc.spindleOff()
     return
 
-def pickupSkittle()
+def pickupSkittle():
+    cnc.spindleOn()
     return
 
-def connectToShapeoko()
+def connectToShapeoko():
     serialObject = serial.Serial(0)
     print serialObject.name
 
     return serialObject
 
-def disconnectFromShapeoko(ser)
+def disconnectFromShapeoko(ser):
     ser.close()
 
 
-def defgetColourIndex()
+def defgetColourIndex():
 	return
 
-def getReducedImage( colourIndex, inputImage)
+def getReducedImage( colourIndex, inputImage):
 	return
 
 
@@ -148,4 +131,30 @@ http://pyserial.sourceforge.net/shortintro.html
 
 	
 
+
+
+#shapeoko = connectToShapeoko()
+cnc.init()
+cnc.spindleOff()
+
+#for row_i in range(0, numRows-1):
+row_i = 0
+while row_i < 16:
+	#for col_i in range(0, numCols - 1):
+
+    #comment out for now, just one pickup (0,0) and move put into grid from there
+    #pixelColour = getPixelColour( reducedImage, row_i, col_i)
+	
+    pickUpX , pickUpY = getPickupLocation( )
+		
+    gotoLocation(pickUpX , pickUpY)
+
+    pickupSkittle()
+
+    dropX, dropY = getDropLocation( row_i, row_i )
+
+    gotoLocation(dropX, dropY)
+
+    dropSkittle()
+    row_i = row_i + 1
 
