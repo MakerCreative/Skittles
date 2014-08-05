@@ -37,6 +37,7 @@ ser = None
 DEBUG = False
 
 spindleIsOn = False 
+isRelative = False
 
 def init():
     """Setup the system, flush grbl, etc."""
@@ -198,7 +199,11 @@ def rapidmove(pos):
     """Move up to safe height, then rapid to pos, then down to z=0."""
     command("G0 Z%.03f" % safe_height)
     command("G0 X%.03f Y%.03f" % pos)
-    command("G0 Z0")
+    global isRelative
+    if isRelative:
+        command("G0 Z-%.03f" % safe_height)
+    else:
+        command("G0 Z0")
 
 
 def rapidmoveNoZ(pos):
@@ -601,10 +606,14 @@ def fillcircle(centre, radius, depth, start_depth=0.0, depth_first=True):
 
 def setCoordAbsolute():
     command("G90")
+    global isRelative
+    isRelative = False
     return
 
 def setCoordRelative():
     command("G91")
+    global isRelative
+    isRelative = True
     return
 
 def spindleOn():

@@ -27,12 +27,13 @@ def findSkittle(f):
   
     # threshold the iamge, find the right spot to separate the skittle from the background
     at = cv2.adaptiveThreshold(blur2,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,15 ,4)
+    #cv2.imshow("at", at)
     
     # use a morphological operator to clean up the result
     kernelSize = 5
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(kernelSize,kernelSize))
     atClose = cv2.morphologyEx(at, cv2.MORPH_CLOSE, kernel)
-    
+    #cv2.imshow("atClose", atClose)
     # find the contours in the image, that is all the connected dots 
     contours,hierarchy = cv2.findContours(atClose,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     
@@ -117,7 +118,7 @@ def getFrame():
         frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
         frameOld = frameAvg.copy()
 
-def moveToSkittle(deltaPX):
+def moveToSkittle(deltaPx):
     distanceToSkittlePx =     np.linalg.norm(deltaPx)
     
     # move if we are too far away and havne't moved for a bit
@@ -129,6 +130,7 @@ def moveToSkittle(deltaPX):
         deltaMM = deltaPx * scalePxToMM 
         cnc.rapidmoveNoZ( (deltaMM[0] , -deltaMM[1]))
     
+    return distanceToSkittlePx
     
 #####################################################################################
 if __name__ == "__main__":

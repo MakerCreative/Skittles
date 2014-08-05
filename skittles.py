@@ -1,5 +1,6 @@
 import serial
 import cnc
+import skittleTracking
 
 # all measurements in mm
 
@@ -10,7 +11,7 @@ pixelSpace = 3  # spacing between skittles [mm]
 global numPickUpSpots 
 global curPickUpSpot 
 
-numPickUpSpots = 16  
+numPickUpSpots = 5  
 curPickUpSpot  = 0  
 
 #global skittleHeight
@@ -129,7 +130,7 @@ http://pyserial.sourceforge.net/shortintro.html
 """
 
 
-	
+
 
 
 
@@ -137,23 +138,43 @@ http://pyserial.sourceforge.net/shortintro.html
 cnc.init()
 cnc.spindleOff()
 
+skittleTracking.init()
+
 #for row_i in range(0, numRows-1):
 row_i = 0
-while row_i < 16:
-	#for col_i in range(0, numCols - 1):
+while row_i < 5:
+    #for col_i in range(0, numCols - 1):
 
     #comment out for now, just one pickup (0,0) and move put into grid from there
     #pixelColour = getPixelColour( reducedImage, row_i, col_i)
-	
+    
     pickUpX , pickUpY = getPickupLocation( )
-		
+    
     gotoLocation(pickUpX , pickUpY)
 
+    distanceToSkittle = 10
+    
+    cnc.setCoordRelative()
+    while distanceToSkittle > 3:
+        skittleTracking.getFrame()
+
+        deltaPx = skittleTracking.findSkittle(skittleTracking.frameAvg)
+       
+        distanceToSkittle = skittleTracking.moveToSkittle(deltaPx)
+        
+    # move over for camera - picker difference    
+    cnc.rapidmove((-11,-3))
+    cnc.setCoordAbsolute()
+        
     pickupSkittle()
 
     dropX, dropY = getDropLocation( row_i, row_i )
 
     gotoLocation(dropX, dropY)
+    cnc.setCoordRelative()
+    cnc.rapidmove((-11,-3))
+    cnc.setCoordAbsolute()
+
 
     dropSkittle()
     row_i = row_i + 1
