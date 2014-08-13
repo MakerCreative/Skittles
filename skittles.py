@@ -1,7 +1,7 @@
 import serial
 import cnc
 import skittleTracking
-
+import cv2
 # all measurements in mm
 
 # hole centers were 15 mm appart when drilled
@@ -14,50 +14,9 @@ global curPickUpSpot
 numPickUpSpots = 5  
 curPickUpSpot  = 0  
 
-#global skittleHeight
-#skittleHeight = 7 # height of a skittle relative to origin
+# mm from camera to picker need to subtract thsi from where we want the picker to go
+cameraPickerOffset = (-10 , -2)
 
-# where are we going to zero the picker head?
-# let's have the X's be the pickup spots for each colour skittle
-# they should each just have their own coordinates for fine tuning
-# note these will have to have 3 coordinates, could pick and place on different levels.
-
-# Z is an arbitrary zero spot
-
-#**************************************************
-#*   Z
-#*
-#*      X      X      X      X       X       X
-#*
-#*
-#*
-#*             ----------------------
-#*             |                    |
-#*             |                    |
-#*             |                    |
-#*             |                    |
-#*             |                    |
-#*             |                    |
-#*             |                    |
-#*             |                    |
-#*             ----------------------
-#*
-#*
-#*
-#*
-#***************************************************
-
-
-# *************** this can be done offline
-
-# get the set of colours we can use for this piece
-#colourIndex = getColourIndex()
-
-# get a 2d grid of pixels from our input image using our colour index
-# might be able to do this with PIL or Pillow
-#reducedImage = getReducedImage( colourIndex, inputImage)
-
-# *************** end this can be done offline
 
 numRows = 15 # take from image
 numCols = 15 # take from image
@@ -131,9 +90,6 @@ http://pyserial.sourceforge.net/shortintro.html
 
 
 
-
-
-
 #shapeoko = connectToShapeoko()
 cnc.init()
 cnc.spindleOff()
@@ -150,32 +106,41 @@ while row_i < 5:
     
     pickUpX , pickUpY = getPickupLocation( )
     
-    gotoLocation(pickUpX , pickUpY)
-
+   
+    #cnc.rapidmoveNoZ( ( pickUpX- cameraPickerOffset[0], pickUpY- cameraPickerOffset[1] ))
+    cnc.rapidmoveNoZ( ( pickUpX, pickUpY ))
+    
     distanceToSkittle = 10
     
     cnc.setCoordRelative()
+    skittleTracking.getFrame()
+    skittleTracking.getFrame()
     while distanceToSkittle > 3:
         skittleTracking.getFrame()
 
         deltaPx = skittleTracking.findSkittle(skittleTracking.frameAvg)
-       
         distanceToSkittle = skittleTracking.moveToSkittle(deltaPx)
-        
+        cv2.imshow('SKITTLE', skittleTracking.frameAvg)
+        cv2.waitKey(50)
     # move over for camera - picker difference    
-    cnc.rapidmove((-11,-3))
+    cnc.rapidmoveNoZ(cameraPickerOffset)
     cnc.setCoordAbsolute()
-        
+    
+    cnc.relMoveZ(-20)
     pickupSkittle()
+    cnc.relMoveZ(20)
 
     dropX, dropY = getDropLocation( row_i, row_i )
 
-    gotoLocation(dropX, dropY)
-    cnc.setCoordRelative()
-    cnc.rapidmove((-11,-3))
-    cnc.setCoordAbsolute()
+    cnc.rapidmoveNoZ( ( dropX + cameraPickerOffset[0], dropY+ cameraPickerOffset[1] ))
+    #cnc.setCoordRelative()
+    #cnc.rapidmove((-11,-3))
+    #cnc.setCoordAbsolute()
 
-
+    cnc.relMoveZ(-20)
     dropSkittle()
+    cnc.relMoveZ(20)
+
     row_i = row_i + 1
 
+cnc.rapidmoveNoZ( ( 0,0 ))

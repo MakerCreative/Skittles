@@ -205,7 +205,14 @@ def rapidmove(pos):
     else:
         command("G0 Z0")
 
-
+def relMoveZ(z):
+    global isRelative
+    wasRelative = isRelative
+    setCoordRelative()
+    command("G0 Z%.03f" % z)
+    if not wasRelative:
+        setCoordAbsolute()
+    
 def rapidmoveNoZ(pos):
     """Move up to safe height, then rapid to pos, then down to z=0."""
     command("G0 X%.03f Y%.03f" % pos)
