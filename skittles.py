@@ -11,7 +11,7 @@ pixelSpace = 3  # spacing between skittles [mm]
 global numPickUpSpots 
 global curPickUpSpot 
 
-numPickUpSpots = 5  
+numPickUpSpots = 4  
 curPickUpSpot  = 0  
 
 # mm from camera to picker need to subtract thsi from where we want the picker to go
@@ -37,7 +37,7 @@ def getDropLocation(row_i,col_i):
     yOffset = 30  
 
     dropX = xOffset + row_i * (pixelWidth + pixelSpace )  
-    dropY = yOffset + col_i * (pixelWidth + pixelSpace )  
+    dropY = yOffset + (col_i%3) * (pixelWidth + pixelSpace )  
     
     return dropX, dropY
     
@@ -98,7 +98,7 @@ skittleTracking.init()
 
 #for row_i in range(0, numRows-1):
 row_i = 0
-while row_i < 5:
+while row_i < numPickUpSpots:
     #for col_i in range(0, numCols - 1):
 
     #comment out for now, just one pickup (0,0) and move put into grid from there
@@ -143,4 +143,4 @@ while row_i < 5:
 
     row_i = row_i + 1
 
-cnc.rapidmoveNoZ( ( 0,0 ))
+#cnc.rapidmoveNoZ( ( 0,0 ))
