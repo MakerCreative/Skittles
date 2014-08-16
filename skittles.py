@@ -11,7 +11,7 @@ pixelSpace = 3  # spacing between skittles [mm]
 global numPickUpSpots 
 global curPickUpSpot 
 
-numPickUpSpots = 4  
+numPickUpSpots = 16  
 curPickUpSpot  = 0  
 
 # mm from camera to picker need to subtract thsi from where we want the picker to go
@@ -37,7 +37,9 @@ def getDropLocation(row_i,col_i):
     yOffset = 30  
 
     dropX = xOffset + row_i * (pixelWidth + pixelSpace )  
-    dropY = yOffset + (col_i%3) * (pixelWidth + pixelSpace )  
+    #dropY = yOffset + (col_i%3) * (pixelWidth + pixelSpace )  
+    dropY = yOffset + 1 * (pixelWidth + pixelSpace )
+    
     
     return dropX, dropY
     
