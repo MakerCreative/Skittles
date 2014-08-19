@@ -112,10 +112,10 @@ def getFrame():
     if firstFrame:
         firstFrame = False
         frameOld = frame.copy()
-        frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
+        frameAvg = cv2.addWeighted(frame,.8,frameOld,.2,0)
 
     else:
-        frameAvg = cv2.addWeighted(frame,.9,frameOld,.1,0)
+        frameAvg = cv2.addWeighted(frame,.8,frameOld,.2,0)
         frameOld = frameAvg.copy()
 
 def moveToSkittle(deltaPx):

@@ -2,6 +2,7 @@ import serial
 import cnc
 import skittleTracking
 import cv2
+import time
 # all measurements in mm
 
 # hole centers were 15 mm appart when drilled
@@ -11,21 +12,30 @@ pixelSpace = 3  # spacing between skittles [mm]
 global numPickUpSpots 
 global curPickUpSpot 
 
-numPickUpSpots = 16  
+numPickUpSpots = 2  
 curPickUpSpot  = 0  
 
 # mm from camera to picker need to subtract thsi from where we want the picker to go
-cameraPickerOffset = (-10 , -2)
+cameraPickerOffset = (-10 , -1.5)
 
 
-numRows = 15 # take from image
-numCols = 15 # take from image
+#numRows = 15 # take from image
+#numCols = 15 # take from image
 def getPickupLocation():
     global curPickUpSpot
 
-    pickupY = 0 # by defn
     
-    pickupX = 0 + (pixelWidth+pixelSpace)*curPickUpSpot
+    
+    if 0 == curPickUpSpot:
+        pickupX = 0 
+        pickupY = 0
+    if 1 == curPickUpSpot:
+        pickupX = 185
+        pickupY = 190
+
+   # pickupY = 0 # by defn
+    #pickupX = (pixelWidth+pixelSpace) + (pixelWidth+pixelSpace)*curPickUpSpot
+    
     curPickUpSpot = (curPickUpSpot + 1) % numPickUpSpots 
     return pickupX,pickupY
 
@@ -33,17 +43,79 @@ def getDropLocation(row_i,col_i):
     dropX = 0
     dropY = 0 
 
-    xOffset = 0 
-    yOffset = 30  
+    xOffset = 185 
+    yOffset = 190  
 
-    dropX = xOffset + row_i * (pixelWidth + pixelSpace )  
+    #dropX = xOffset + row_i * (pixelWidth + pixelSpace )  
     #dropY = yOffset + (col_i%3) * (pixelWidth + pixelSpace )  
     dropY = yOffset + 1 * (pixelWidth + pixelSpace )
     
     
-    return dropX, dropY
+    #return dropX, dropY
     
+    # offset from black origin to bottom left of work space
+    # y = 178
+    # x = 184
 
+    # new
+    # start of light blue (there are 6)
+    
+    if 0 == curPickUpSpot:
+        dropX = 0
+        dropY = 0 
+    if 1 == curPickUpSpot:
+        dropX = xOffset
+        dropY = yOffset
+    '''    
+    elif 1.1 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 2 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 3 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 4 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 5 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+        
+    # start of dark blue (the rest)
+    elif 6 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 7 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 8 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 9 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 10 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 11 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 12 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 13 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 14 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+    elif 15 == curPickUpSpot:
+        dropX = 0
+        dropY = 0
+   '''
+    return dropX, dropY
 
 def gotoLocation(dropX, dropY):
     cnc.rapidmove((dropX,dropY))
@@ -51,10 +123,12 @@ def gotoLocation(dropX, dropY):
 
 def dropSkittle():
     cnc.spindleOff()
+    time.sleep(1)
     return
 
 def pickupSkittle():
     cnc.spindleOn()
+    time.sleep(1)
     return
 
 def connectToShapeoko():
@@ -100,7 +174,7 @@ skittleTracking.init()
 
 #for row_i in range(0, numRows-1):
 row_i = 0
-while row_i < numPickUpSpots:
+while True: #row_i < numPickUpSpots:
     #for col_i in range(0, numCols - 1):
 
     #comment out for now, just one pickup (0,0) and move put into grid from there
@@ -110,13 +184,16 @@ while row_i < numPickUpSpots:
     
    
     #cnc.rapidmoveNoZ( ( pickUpX- cameraPickerOffset[0], pickUpY- cameraPickerOffset[1] ))
-    cnc.rapidmoveNoZ( ( pickUpX, pickUpY ))
+    cnc.rapidmoveNoZ( ( pickUpX + 3, pickUpY + 3 ))
     
     distanceToSkittle = 10
     
     cnc.setCoordRelative()
-    skittleTracking.getFrame()
-    skittleTracking.getFrame()
+    frameI = 0
+    while frameI < 60:
+        skittleTracking.getFrame()
+        frameI = frameI + 1
+    
     while distanceToSkittle > 3:
         skittleTracking.getFrame()
 
@@ -130,16 +207,15 @@ while row_i < numPickUpSpots:
     
     cnc.relMoveZ(-20)
     pickupSkittle()
-    cnc.relMoveZ(20)
+    cnc.relMoveZ(30)
 
     dropX, dropY = getDropLocation( row_i, row_i )
-
+    
+    #move the camera to the black dot
     cnc.rapidmoveNoZ( ( dropX + cameraPickerOffset[0], dropY+ cameraPickerOffset[1] ))
-    #cnc.setCoordRelative()
-    #cnc.rapidmove((-11,-3))
-    #cnc.setCoordAbsolute()
+        
 
-    cnc.relMoveZ(-20)
+    cnc.relMoveZ(-30)
     dropSkittle()
     cnc.relMoveZ(20)
 
